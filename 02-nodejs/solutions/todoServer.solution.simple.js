@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const app = express();
-
+const app = express()
 app.use(bodyParser.json());
 
 let todos = [];
@@ -71,4 +70,4 @@ app.use((req, res, next) => {
   res.status(404).send();
 });
 
-module.exports = app;
+app.listen(3000)
