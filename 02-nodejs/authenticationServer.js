@@ -33,29 +33,75 @@ const express = require("express")
 const PORT = 3000;
 const app = express();
 // write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
-const data = []
+const users = []
+app.use(express.json())
  app.post('/signup', (req, res) => {
    console.log(req.body)
-   const {name, password} = req.body
-   data.push({name, password})
-   res.send('ok')  
+   let user  = req.body
+   let userAlreadyExists= false
+   for(let i=0;i< users.length ; i++){
+    if(users[i].email=user.email){
+       userAlreadyExists= true
+       break;
+    }
+   }
+   if(userAlreadyExists){
+    res.sendStatus(400)
+   }
+   else{
+     users.push(user)
+     res.status(201).send("Signup Successfully")
+   }
  })
  
  app.post(
   '/login',
   (req, res) => {
-    const {name, password} = req.body
-    const user = data.find((user) => user.name === name && user.password === password)
-    if(user) {
-      res.send('ok')
-    } else {
-      res.send('not ok')
-    }
-  })
+     let user = req.body
+     let userFound = null
+     for (let i = 0; i< users.length; i++) {
+       if(users[i].email=user.email){
+        userFound= users[i]
+        break
+       }
+     }
 
- app.get('/', (req, res) => {
-   res.send(data)
-   console.log(data)
+    if(userFound){
+      res.json({
+        name:userFound.name,
+        email: userFound.email
+      })
+    }else{
+        res.status.send(401)
+      }
+    }
+  )
+
+ app.get('/data', (req, res) => {
+   let email=req.headers.email;
+   let password = req.headers.password
+   let userFound = false
+   for(let i=0;i<users.length;i++){
+  if(users[i].email===email && users[i].password===password){
+    userFound=true
+    break
+  }
+   }
+   if(userFound){
+    let usersToReturn=[]
+    for(let i=0;i<users.length;i++){
+      usersToReturn.push({
+        name: users[i].name,
+        email: users[i].email
+      })
+    }
+    res.json({
+      users
+    })
+   }
+   else{
+    res.status(401)
+   }
    
  })
  
