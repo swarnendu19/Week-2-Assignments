@@ -3,49 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>To-Do List App</title>
+     <title>To-Do List App</title>
 </head>
 <script> 
+
+   function deleteTodo(id){
+    fetch("http://localhost:5500/todos/"+id, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': "application/json"
+        }
+   }).then(()=>{
+    console.log("done delete");
+   })
+}
    function getData(){
-    fetch("http://localhost:3000/todos",{
+    fetch("http://localhost:5500/todos",{
         method: "GET",
 
     }).then((res)=>{
         res.json().then((data)=>{
             console.log(data);
+            let  parentElement =document.getElementById("mainArea")
+            // presentElement.innerHTML=JSON.stringify(data)
+            for(let i=0;i<data.length;i++){
+            let childElement = document.createElement('div')
+            let grandChildElement1=document.createElement('span')
+            grandChildElement1.innerHTML=data[i].title
+
+             let grandChildElement2=document.createElement('span')
+            grandChildElement2.innerHTML=data[i].description
+ 
+            let grandChildElement3=document.createElement('button')
+            grandChildElement3.innerHTML= 'Delete'
+            grandChildElement3.setAttribute('onClick','deleteTodo('+data[i].id+')')
+
+            childElement.appendChild(grandChildElement1)
+            childElement.appendChild(grandChildElement2)
+            childElement.appendChild(grandChildElement3)
+
+            parentElement.appendChild(childElement)
+            }
         })
     })
    }
+   getData()
+   
+   function onPress() {
+    let title = document.getElementById("title").value;
+    let description = document.getElementById('description').value;
 
-    let title = document.getElementById('title').value
-    let description  = document.getElementById('description').value
+    fetch("http://localhost:5500/todos", {
+        method: "POST",
+        body: JSON.stringify({
+            title: title,
+            description: description
+        }),
+        headers: {
+            'Content-Type': "application/json"
+        }
+    }).then((res) => {
+        res.json().then((data) => {
+            console.log(data);
 
-    function onPress(){
-        fetch("http://localhost:3000/todos",{
-            method : "POST",
-            body: JSON.stringify({
-                title: "gym",
-                description: "Go to the gym"
-            }),
-            headers: {
-                'Content-Type': "application/json"
-            } 
-        }).then((res)=>{
-            res.json().then((data)=>{
-                console.log(data);
-            })
-        })
-    }
+            let parentElement = document.getElementById("mainArea");
+            let childElement = document.createElement('div');
+            let grandChildElement1 = document.createElement('span');
+            grandChildElement1.innerHTML = data.title;
+
+            let grandChildElement2 = document.createElement('span');
+            grandChildElement2.innerHTML = data.description;
+
+            let grandChildElement3 = document.createElement('button');
+            grandChildElement3.innerHTML = 'Delete';
+
+            childElement.appendChild(grandChildElement1);
+            childElement.appendChild(grandChildElement2);
+            childElement.appendChild(grandChildElement3);
+
+            parentElement.appendChild(childElement);
+        });
+    });
+}
+
+
 </script>
 <body>
     <h1>To-Do List</h1>
     <div class="todo-container">
         <input type="text" id="title" placeholder="Add a new task">
         <input type="text"id="description">
-        <button id="add-task-btn" onclick=onPress()>Add Task</button>
+        <button id="add-task-btn"  onclick=onPress() >Add Task</button>
+        <div id="mainArea" >
+        Hi there
+        </div>
         <ul id="task-list"></ul>
     </div>
-    <script src="app.js"></script>
-</body>
+ </body>
 </html>
